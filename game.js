@@ -4,16 +4,12 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// =====================
 // UI
-// =====================
 const startScreen = document.getElementById("startScreen");
 const gameScreen = document.getElementById("gameScreen");
 const startBtn = document.getElementById("startBtn");
 
-// =====================
-// GAME STATE (FIXED SYSTEM)
-// =====================
+// GAME STATE
 let state = "menu"; // menu | playing
 
 let asteroids = [];
@@ -21,10 +17,10 @@ let stars = [];
 let particles = [];
 
 let difficulty = 1;
-let difficultyIncrease = 0.002;
+let animationId;
 
 // =====================
-// IMAGES (SAFE LOADING)
+// IMAGES
 // =====================
 const shipImg = new Image();
 const rockImg = new Image();
@@ -35,23 +31,6 @@ rockImg.src = "images/rock.png";
 starImg.src = "images/star.png";
 
 // =====================
-// START GAME (FIXED)
-// =====================
-startBtn.addEventListener("click", () => {
-    if (state !== "menu") return;
-
-    startScreen.classList.add("hidden");
-    gameScreen.classList.remove("hidden");
-
-    state = "playing";
-
-    stars = [];
-    createStars();
-
-    gameLoop();
-});
-
-// =====================
 // PLAYER
 // =====================
 const player = {
@@ -59,6 +38,33 @@ const player = {
     y: canvas.height - 120,
     size: 60
 };
+
+// =====================
+// START GAME (FIXED)
+// =====================
+startBtn.addEventListener("click", () => {
+    if (state === "playing") return;
+
+    state = "playing";
+
+    startScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+
+    resetGame();
+    gameLoop();
+});
+
+// =====================
+// RESET GAME (IMPORTANT FIX)
+// =====================
+function resetGame() {
+    asteroids = [];
+    stars = [];
+    particles = [];
+    difficulty = 1;
+
+    createStars();
+}
 
 // =====================
 // STARS
@@ -118,9 +124,7 @@ class Particle {
         ctx.save();
         ctx.globalAlpha = this.life;
 
-        const colors = ["orange", "yellow", "red"];
-        ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
-
+        ctx.fillStyle = ["orange", "yellow", "red"][Math.floor(Math.random() * 3)];
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -129,8 +133,8 @@ class Particle {
     }
 }
 
-function createExplosion(x, y, count = 20) {
-    for (let i = 0; i < count; i++) {
+function explosion(x, y) {
+    for (let i = 0; i < 20; i++) {
         particles.push(new Particle(x, y));
     }
 }
@@ -141,7 +145,7 @@ function createExplosion(x, y, count = 20) {
 class Asteroid {
     constructor() {
         this.x = Math.random() * canvas.width;
-        this.y = -60;
+        this.y = -50;
 
         this.size = Math.random() * 40 + 20;
         this.speed = Math.random() * 1.5 + 0.5;
@@ -160,17 +164,19 @@ function spawnAsteroid() {
     asteroids.push(new Asteroid());
 }
 
-// spawn loop (safe)
-setInterval(() => {
+// SAFE SPAWN LOOP
+function spawnLoop() {
     if (state !== "playing") return;
+
     spawnAsteroid();
-}, 900);
+    setTimeout(spawnLoop, 900);
+}
 
 // =====================
 // UPDATE
 // =====================
 function update() {
-    difficulty += difficultyIncrease;
+    difficulty += 0.002;
     difficulty = Math.min(difficulty, 5);
 
     stars.forEach(s => s.update());
@@ -180,10 +186,10 @@ function update() {
     particles = particles.filter(p => p.life > 0);
     asteroids = asteroids.filter(a => a.y < canvas.height + 100);
 
-    // demo explosions (replace later with real collision)
+    // demo explosions
     for (let i = asteroids.length - 1; i >= 0; i--) {
         if (Math.random() < 0.002) {
-            createExplosion(asteroids[i].x, asteroids[i].y);
+            explosion(asteroids[i].x, asteroids[i].y);
             asteroids.splice(i, 1);
         }
     }
@@ -209,7 +215,7 @@ function draw() {
 }
 
 // =====================
-// GAME LOOP (CLEAN + SAFE)
+// GAME LOOP (FIXED)
 // =====================
 function gameLoop() {
     if (state !== "playing") return;
@@ -217,5 +223,5 @@ function gameLoop() {
     update();
     draw();
 
-    requestAnimationFrame(gameLoop);
+    animationId = requestAnimationFrame(gameLoop);
 }
