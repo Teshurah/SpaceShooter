@@ -1,5 +1,3 @@
-console.log("START BTN:", document.getElementById("startBtn"));
-
 window.addEventListener("DOMContentLoaded", () => {
 
 const canvas = document.getElementById("gameCanvas");
@@ -25,14 +23,14 @@ let lastTime = 0;
 let spawnTimer = 0;
 let spawnInterval = 900;
 
-// OBJECTS
+// GAME OBJECTS
 let asteroids = [];
 let stars = [];
 let particles = [];
 let difficulty = 1;
 
 // =====================
-// IMAGES (safe, not blocking)
+// IMAGES (safe fallback)
 // =====================
 const shipImg = new Image();
 const rockImg = new Image();
@@ -41,8 +39,6 @@ const starImg = new Image();
 shipImg.src = "images/ship.png";
 rockImg.src = "images/rock.png";
 starImg.src = "images/star.png";
-
-let imagesLoaded = true;
 
 // =====================
 // PLAYER
@@ -54,10 +50,10 @@ const player = {
 };
 
 // =====================
-// START BUTTON (FIXED)
+// START BUTTON FIX
 // =====================
 startBtn.addEventListener("click", () => {
-    if (state === "playing") return;
+    console.log("START CLICKED");
 
     state = "playing";
 
@@ -66,8 +62,7 @@ startBtn.addEventListener("click", () => {
 
     resetGame();
 
-    lastTime = 0;
-    spawnTimer = 0;
+    lastTime = performance.now();
 
     requestAnimationFrame(gameLoop);
 });
@@ -105,8 +100,6 @@ class Star {
     }
 
     draw() {
-        ctx.fillStyle = "red";
-ctx.fillRect(50, 50, 100, 100);
         ctx.fillStyle = "white";
         ctx.fillRect(this.x, this.y, this.size, this.size);
     }
@@ -181,7 +174,7 @@ function spawnAsteroid() {
 }
 
 // =====================
-// SPAWN CONTROL
+// SPAWN SYSTEM
 // =====================
 function handleSpawning(delta) {
     spawnTimer += delta;
@@ -193,7 +186,7 @@ function handleSpawning(delta) {
 }
 
 // =====================
-// UPDATE
+// UPDATE GAME
 // =====================
 function update() {
     difficulty += 0.002;
@@ -208,15 +201,21 @@ function update() {
 }
 
 // =====================
-// DRAW
+// DRAW GAME
 // =====================
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // background stars
     stars.forEach(s => s.draw());
+
+    // asteroids
     asteroids.forEach(a => a.draw());
+
+    // particles
     particles.forEach(p => p.draw());
 
+    // player (safe fallback shape)
     ctx.fillStyle = "cyan";
     ctx.fillRect(
         player.x - player.size / 2,
@@ -232,14 +231,22 @@ function draw() {
 function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
 
-    if (state !== "playing") return;
-
     const delta = timestamp - lastTime;
     lastTime = timestamp;
 
+    // ALWAYS draw something (prevents blank screen bugs)
+    if (state !== "playing") {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // idle background
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        return;
+    }
+
     update();
     draw();
-
     handleSpawning(delta);
 }
 
