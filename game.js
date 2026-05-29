@@ -10,14 +10,14 @@ const gameScreen = document.getElementById("gameScreen");
 const startBtn = document.getElementById("startBtn");
 
 // GAME STATE
-let state = "menu"; // menu | playing
+let state = "menu";
 
+// GAME OBJECTS
 let asteroids = [];
 let stars = [];
 let particles = [];
 
 let difficulty = 1;
-let animationId;
 
 // =====================
 // IMAGES
@@ -30,6 +30,19 @@ shipImg.src = "images/ship.png";
 rockImg.src = "images/rock.png";
 starImg.src = "images/star.png";
 
+// IMAGE LOADING CHECK
+let imagesLoaded = false;
+let loaded = 0;
+
+function checkLoaded() {
+    loaded++;
+    if (loaded === 3) imagesLoaded = true;
+}
+
+shipImg.onload = checkLoaded;
+rockImg.onload = checkLoaded;
+starImg.onload = checkLoaded;
+
 // =====================
 // PLAYER
 // =====================
@@ -40,7 +53,7 @@ const player = {
 };
 
 // =====================
-// START GAME (FIXED)
+// START GAME
 // =====================
 startBtn.addEventListener("click", () => {
     if (state === "playing") return;
@@ -51,11 +64,13 @@ startBtn.addEventListener("click", () => {
     gameScreen.classList.remove("hidden");
 
     resetGame();
+
     gameLoop();
+    spawnLoop(); // ✅ FIXED: now actually starts spawning
 });
 
 // =====================
-// RESET GAME (IMPORTANT FIX)
+// RESET GAME
 // =====================
 function resetGame() {
     asteroids = [];
@@ -73,7 +88,6 @@ class Star {
     constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-
         this.size = Math.random() * 2 + 0.5;
         this.speed = Math.random() * 0.6 + 0.1;
     }
@@ -105,11 +119,9 @@ class Particle {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-
         this.size = Math.random() * 4 + 2;
         this.speedX = (Math.random() - 0.5) * 6;
         this.speedY = (Math.random() - 0.5) * 6;
-
         this.life = 1;
         this.decay = Math.random() * 0.02 + 0.01;
     }
@@ -124,7 +136,7 @@ class Particle {
         ctx.save();
         ctx.globalAlpha = this.life;
 
-        ctx.fillStyle = ["orange", "yellow", "red"][Math.floor(Math.random() * 3)];
+        ctx.fillStyle = "orange";
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -146,7 +158,6 @@ class Asteroid {
     constructor() {
         this.x = Math.random() * canvas.width;
         this.y = -50;
-
         this.size = Math.random() * 40 + 20;
         this.speed = Math.random() * 1.5 + 0.5;
     }
@@ -164,7 +175,9 @@ function spawnAsteroid() {
     asteroids.push(new Asteroid());
 }
 
-// SAFE SPAWN LOOP
+// =====================
+// SPAWN LOOP
+// =====================
 function spawnLoop() {
     if (state !== "playing") return;
 
@@ -186,7 +199,7 @@ function update() {
     particles = particles.filter(p => p.life > 0);
     asteroids = asteroids.filter(a => a.y < canvas.height + 100);
 
-    // demo explosions
+    // random explosions (demo effect)
     for (let i = asteroids.length - 1; i >= 0; i--) {
         if (Math.random() < 0.002) {
             explosion(asteroids[i].x, asteroids[i].y);
@@ -200,6 +213,8 @@ function update() {
 // =====================
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!imagesLoaded) return;
 
     stars.forEach(s => s.draw());
     asteroids.forEach(a => a.draw());
@@ -215,7 +230,7 @@ function draw() {
 }
 
 // =====================
-// GAME LOOP (FIXED)
+// GAME LOOP
 // =====================
 function gameLoop() {
     if (state !== "playing") return;
@@ -223,5 +238,5 @@ function gameLoop() {
     update();
     draw();
 
-    animationId = requestAnimationFrame(gameLoop);
+    requestAnimationFrame(gameLoop);
 }
