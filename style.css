@@ -21,6 +21,7 @@ body {
     align-items: center;
     background: radial-gradient(circle, #0b0f2a, black);
     color: white;
+    z-index: 10;
 }
 
 #startScreen h1 {
@@ -40,6 +41,9 @@ body {
 
 /* GAME SCREEN */
 #gameScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
 }
