@@ -105,6 +105,8 @@ class Star {
     }
 
     draw() {
+        ctx.fillStyle = "red";
+ctx.fillRect(50, 50, 100, 100);
         ctx.fillStyle = "white";
         ctx.fillRect(this.x, this.y, this.size, this.size);
     }
