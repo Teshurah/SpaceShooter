@@ -4,6 +4,12 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+// resize fix (IMPORTANT for GitHub Pages)
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
 // UI
 const startScreen = document.getElementById("startScreen");
 const gameScreen = document.getElementById("gameScreen");
@@ -15,7 +21,7 @@ let lastTime = 0;
 let spawnTimer = 0;
 let spawnInterval = 900;
 
-// GAME OBJECTS
+// OBJECTS
 let asteroids = [];
 let stars = [];
 let particles = [];
@@ -32,25 +38,8 @@ shipImg.src = "images/ship.png";
 rockImg.src = "images/rock.png";
 starImg.src = "images/star.png";
 
-// image loading safety
-let imagesLoaded = false;
-let loaded = 0;
-
-let images = [shipImg, rockImg, starImg];
-
-images.forEach(img => {
-    img.onload = () => {
-        loaded++;
-        if (loaded === images.length) {
-            imagesLoaded = true;
-            console.log("Images loaded");
-        }
-    };
-
-    img.onerror = () => {
-        console.log("Image failed:", img.src);
-    };
-});
+// IMPORTANT: DO NOT BLOCK GAME ON LOAD
+let imagesLoaded = true;
 
 // =====================
 // PLAYER
@@ -62,10 +51,9 @@ const player = {
 };
 
 // =====================
-// START BUTTON
+// START GAME
 // =====================
 window.addEventListener("DOMContentLoaded", () => {
-
     startBtn.addEventListener("click", () => {
         if (state === "playing") return;
 
@@ -84,7 +72,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // =====================
-// RESET GAME
+// RESET
 // =====================
 function resetGame() {
     asteroids = [];
@@ -96,7 +84,7 @@ function resetGame() {
 }
 
 // =====================
-// STAR BACKGROUND
+// STARS
 // =====================
 class Star {
     constructor() {
@@ -116,7 +104,8 @@ class Star {
     }
 
     draw() {
-        ctx.drawImage(starImg, this.x, this.y, this.size * 4, this.size * 4);
+        ctx.fillStyle = "white";
+        ctx.fillRect(this.x, this.y, this.size, this.size);
     }
 }
 
@@ -148,13 +137,10 @@ class Particle {
     }
 
     draw() {
-        ctx.save();
         ctx.globalAlpha = this.life;
         ctx.fillStyle = "orange";
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+        ctx.globalAlpha = 1;
     }
 }
 
@@ -180,7 +166,10 @@ class Asteroid {
     }
 
     draw() {
-        ctx.drawImage(rockImg, this.x, this.y, this.size, this.size);
+        ctx.fillStyle = "gray";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+        ctx.fill();
     }
 }
 
@@ -221,14 +210,18 @@ function update() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (!imagesLoaded) return;
-
+    // stars
     stars.forEach(s => s.draw());
+
+    // asteroids
     asteroids.forEach(a => a.draw());
+
+    // particles
     particles.forEach(p => p.draw());
 
-    ctx.drawImage(
-        shipImg,
+    // ship (safe draw)
+    ctx.fillStyle = "cyan";
+    ctx.fillRect(
         player.x - player.size / 2,
         player.y - player.size / 2,
         player.size,
@@ -237,7 +230,7 @@ function draw() {
 }
 
 // =====================
-// MAIN GAME LOOP (CLEAN)
+// GAME LOOP (FIXED)
 // =====================
 function gameLoop(timestamp) {
     requestAnimationFrame(gameLoop);
