@@ -4,15 +4,15 @@ const ctx = canvas.getContext("2d");
 canvas.width = 800;
 canvas.height = 600;
 
-// ---------------- IMAGES ----------------
+// ---------------- IMAGES (FIXED PATHS) ----------------
 const shipImg = new Image();
-shipImg.src = "images/ship.png";
+shipImg.src = "./images/ship.png";
 
 const rockImg = new Image();
-rockImg.src = "images/rock.png";
+rockImg.src = "./images/rock.png";
 
 const starImg = new Image();
-starImg.src = "images/star.png";
+starImg.src = "./images/star.png";
 
 // ---------------- PLAYER ----------------
 const player = {
@@ -23,7 +23,7 @@ const player = {
   speed: 7
 };
 
-// ---------------- GAME DATA ----------------
+// ---------------- GAME VARIABLES ----------------
 let rocks = [];
 let stars = [];
 let score = 0;
@@ -48,7 +48,7 @@ function collide(a, b) {
   );
 }
 
-// ---------------- SPAWN ----------------
+// ---------------- SPAWN OBJECTS ----------------
 function spawnRock() {
   rocks.push({
     x: Math.random() * (canvas.width - 40),
@@ -69,17 +69,24 @@ function spawnStar() {
   });
 }
 
-// ---------------- UPDATE ----------------
+// ---------------- UPDATE GAME ----------------
 function update() {
   // movement
-  if (keys["ArrowLeft"] && player.x > 0) player.x -= player.speed;
-  if (keys["ArrowRight"] && player.x < canvas.width - player.width) player.x += player.speed;
+  if (keys["ArrowLeft"] && player.x > 0) {
+    player.x -= player.speed;
+  }
+
+  if (keys["ArrowRight"] && player.x < canvas.width - player.width) {
+    player.x += player.speed;
+  }
 
   // rocks
   rocks.forEach((rock, i) => {
     rock.y += rock.speed;
 
-    if (rock.y > canvas.height) rocks.splice(i, 1);
+    if (rock.y > canvas.height) {
+      rocks.splice(i, 1);
+    }
 
     if (collide(player, rock)) {
       alert("💥 Game Over! Score: " + score);
@@ -91,7 +98,9 @@ function update() {
   stars.forEach((star, i) => {
     star.y += star.speed;
 
-    if (star.y > canvas.height) stars.splice(i, 1);
+    if (star.y > canvas.height) {
+      stars.splice(i, 1);
+    }
 
     if (collide(player, star)) {
       score += 10;
@@ -112,10 +121,14 @@ function draw() {
   ctx.drawImage(shipImg, player.x, player.y, player.width, player.height);
 
   // rocks
-  rocks.forEach(r => ctx.drawImage(rockImg, r.x, r.y, r.width, r.height));
+  rocks.forEach(r => {
+    ctx.drawImage(rockImg, r.x, r.y, r.width, r.height);
+  });
 
   // stars
-  stars.forEach(s => ctx.drawImage(starImg, s.x, s.y, s.width, s.height));
+  stars.forEach(s => {
+    ctx.drawImage(starImg, s.x, s.y, s.width, s.height);
+  });
 
   // score
   ctx.fillStyle = "white";
@@ -123,7 +136,7 @@ function draw() {
   ctx.fillText("Score: " + score, 10, 30);
 }
 
-// ---------------- LOOP ----------------
+// ---------------- GAME LOOP ----------------
 function loop() {
   update();
   draw();
