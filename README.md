@@ -1,2 +1,0 @@
-# SpaceShooter
-Just an experiment
