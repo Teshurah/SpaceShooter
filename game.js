@@ -4,12 +4,16 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+// =====================
 // UI
+// =====================
 const startScreen = document.getElementById("startScreen");
 const gameScreen = document.getElementById("gameScreen");
 const startBtn = document.getElementById("startBtn");
 
+// =====================
 // GAME STATE
+// =====================
 let gameStarted = false;
 
 let asteroids = [];
@@ -30,32 +34,20 @@ shipImg.src = "images/ship.png";
 rockImg.src = "images/rock.png";
 starImg.src = "images/star.png";
 
-let loaded = 0;
+let assetsLoaded = 0;
 let assetsReady = false;
 
-function checkLoaded() {
-    loaded++;
-    if (loaded === 3) {
+function onAssetLoad() {
+    assetsLoaded++;
+    if (assetsLoaded === 3) {
         assetsReady = true;
+        console.log("All assets loaded");
     }
 }
 
-shipImg.onload = checkLoaded;
-rockImg.onload = checkLoaded;
-starImg.onload = checkLoaded;
-
-// =====================
-// START GAME
-// =====================
-startBtn.addEventListener("click", () => {
-    startScreen.classList.add("hidden");
-    gameScreen.classList.remove("hidden");
-
-    createStars();
-
-    gameStarted = true;
-    gameLoop();
-});
+shipImg.onload = onAssetLoad;
+rockImg.onload = onAssetLoad;
+starImg.onload = onAssetLoad;
 
 // =====================
 // PLAYER
@@ -65,6 +57,23 @@ const player = {
     y: canvas.height - 120,
     size: 60
 };
+
+// =====================
+// START GAME (FIXED)
+// =====================
+startBtn.addEventListener("click", () => {
+    if (gameStarted) return;
+
+    startScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
+
+    gameStarted = true;
+
+    stars = [];
+    createStars();
+
+    requestAnimationFrame(gameLoop);
+});
 
 // =====================
 // STARS
@@ -80,6 +89,7 @@ class Star {
 
     update() {
         this.y += this.speed;
+
         if (this.y > canvas.height) {
             this.y = 0;
             this.x = Math.random() * canvas.width;
@@ -123,7 +133,9 @@ class Particle {
         ctx.save();
         ctx.globalAlpha = this.life;
 
-        ctx.fillStyle = ["orange", "yellow", "red"][Math.floor(Math.random() * 3)];
+        const colors = ["orange", "yellow", "red"];
+        ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -163,8 +175,10 @@ function spawnAsteroid() {
     asteroids.push(new Asteroid());
 }
 
+// spawn loop (safe)
 setInterval(() => {
-    if (gameStarted) spawnAsteroid();
+    if (!gameStarted) return;
+    spawnAsteroid();
 }, 900);
 
 // =====================
@@ -181,7 +195,7 @@ function update() {
     particles = particles.filter(p => p.life > 0);
     asteroids = asteroids.filter(a => a.y < canvas.height + 100);
 
-    // demo explosion (replace later with real collision)
+    // demo explosions (replace later with real collision)
     for (let i = asteroids.length - 1; i >= 0; i--) {
         if (Math.random() < 0.002) {
             createExplosion(asteroids[i].x, asteroids[i].y);
@@ -196,10 +210,16 @@ function update() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // stars
     stars.forEach(s => s.draw());
+
+    // asteroids
     asteroids.forEach(a => a.draw());
+
+    // particles
     particles.forEach(p => p.draw());
 
+    // player ship
     ctx.drawImage(
         shipImg,
         player.x - player.size / 2,
@@ -210,7 +230,7 @@ function draw() {
 }
 
 // =====================
-// LOOP
+// GAME LOOP (FIXED)
 // =====================
 function gameLoop() {
     if (!gameStarted) return;
