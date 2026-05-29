@@ -1,22 +1,18 @@
 body {
   margin: 0;
   background: black;
-  overflow: hidden;
+  color: white;
+  text-align: center;
+  font-family: Arial, sans-serif;
 }
 
-#gameArea {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
+h1 {
+  margin-top: 10px;
 }
 
-#player {
-  width: 50px;
-  height: 50px;
-  background: cyan;
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 10px;
+canvas {
+  display: block;
+  margin: 10px auto;
+  background: radial-gradient(circle, #0b0f2a, #000);
+  border: 2px solid white;
 }
