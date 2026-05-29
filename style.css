@@ -31,15 +31,11 @@ body {
 #startBtn {
     margin-top: 20px;
     padding: 12px 25px;
-    font-size: 18px;
-    background: cyan;
     border: none;
     cursor: pointer;
+    background: cyan;
+    font-size: 18px;
     border-radius: 8px;
-}
-
-#startBtn:hover {
-    background: white;
 }
 
 /* GAME SCREEN */
@@ -50,7 +46,6 @@ body {
 
 canvas {
     display: block;
-    background: black;
 }
 
 .hidden {
