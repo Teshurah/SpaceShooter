@@ -6,38 +6,64 @@
 
 body {
     overflow: hidden;
-    background: black;
     font-family: Arial, sans-serif;
+    background: black;
 }
 
-/* Game container */
-.game-wrapper {
-    position: relative;
+/* START SCREEN */
+#startScreen {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background: radial-gradient(circle at center, #0b0f2a, black);
+    color: white;
+}
+
+#startScreen h1 {
+    font-size: 40px;
+    color: cyan;
+    margin-bottom: 10px;
+}
+
+#startScreen p {
+    opacity: 0.7;
+    margin-bottom: 20px;
+}
+
+#startBtn {
+    padding: 12px 25px;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    background: cyan;
+    color: black;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+#startBtn:hover {
+    transform: scale(1.05);
+    background: white;
+}
+
+/* GAME SCREEN */
+#gameScreen {
     width: 100vw;
     height: 100vh;
 }
 
-/* Canvas */
 canvas {
     display: block;
-    background: radial-gradient(circle at center, #0b0f2a, #000000);
+    background: black;
 }
 
-/* UI overlay */
-.ui {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    color: white;
-    z-index: 10;
-}
-
-.ui h1 {
-    font-size: 24px;
-    color: cyan;
-}
-
-.ui p {
-    font-size: 14px;
-    opacity: 0.7;
+/* HIDE */
+.hidden {
+    display: none;
 }
