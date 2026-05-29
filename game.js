@@ -30,7 +30,6 @@ shipImg.src = "images/ship.png";
 rockImg.src = "images/rock.png";
 starImg.src = "images/star.png";
 
-// IMAGE LOADING CHECK
 let imagesLoaded = false;
 let loaded = 0;
 
@@ -53,20 +52,28 @@ const player = {
 };
 
 // =====================
-// START GAME
+// DOM READY + START BUTTON
 // =====================
-startBtn.addEventListener("click", () => {
-    if (state === "playing") return;
+window.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM ready");
 
-    state = "playing";
+    console.log("Start button found:", startBtn);
 
-    startScreen.classList.add("hidden");
-    gameScreen.classList.remove("hidden");
+    startBtn.addEventListener("click", () => {
+        console.log("🔥 START CLICKED");
 
-    resetGame();
+        if (state === "playing") return;
 
-    gameLoop();
-    spawnLoop(); // ✅ FIXED: now actually starts spawning
+        state = "playing";
+
+        startScreen.classList.add("hidden");
+        gameScreen.classList.remove("hidden");
+
+        resetGame();
+
+        gameLoop();
+        spawnLoop();
+    });
 });
 
 // =====================
@@ -199,7 +206,6 @@ function update() {
     particles = particles.filter(p => p.life > 0);
     asteroids = asteroids.filter(a => a.y < canvas.height + 100);
 
-    // random explosions (demo effect)
     for (let i = asteroids.length - 1; i >= 0; i--) {
         if (Math.random() < 0.002) {
             explosion(asteroids[i].x, asteroids[i].y);
