@@ -1,3 +1,5 @@
+console.log("START BTN:", document.getElementById("startBtn"));
+
 window.addEventListener("DOMContentLoaded", () => {
 
 const canvas = document.getElementById("gameCanvas");
