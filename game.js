@@ -11,12 +11,14 @@ const startBtn = document.getElementById("startBtn");
 
 // GAME STATE
 let state = "menu";
+let lastTime = 0;
+let spawnTimer = 0;
+let spawnInterval = 900;
 
 // GAME OBJECTS
 let asteroids = [];
 let stars = [];
 let particles = [];
-
 let difficulty = 1;
 
 // =====================
@@ -30,17 +32,25 @@ shipImg.src = "images/ship.png";
 rockImg.src = "images/rock.png";
 starImg.src = "images/star.png";
 
+// image loading safety
 let imagesLoaded = false;
 let loaded = 0;
 
-function checkLoaded() {
-    loaded++;
-    if (loaded === 3) imagesLoaded = true;
-}
+let images = [shipImg, rockImg, starImg];
 
-shipImg.onload = checkLoaded;
-rockImg.onload = checkLoaded;
-starImg.onload = checkLoaded;
+images.forEach(img => {
+    img.onload = () => {
+        loaded++;
+        if (loaded === images.length) {
+            imagesLoaded = true;
+            console.log("Images loaded");
+        }
+    };
+
+    img.onerror = () => {
+        console.log("Image failed:", img.src);
+    };
+});
 
 // =====================
 // PLAYER
@@ -52,16 +62,11 @@ const player = {
 };
 
 // =====================
-// DOM READY + START BUTTON
+// START BUTTON
 // =====================
 window.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM ready");
-
-    console.log("Start button found:", startBtn);
 
     startBtn.addEventListener("click", () => {
-        console.log("🔥 START CLICKED");
-
         if (state === "playing") return;
 
         state = "playing";
@@ -71,8 +76,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
         resetGame();
 
-        gameLoop();
-        spawnLoop();
+        lastTime = 0;
+        spawnTimer = 0;
+
+        requestAnimationFrame(gameLoop);
     });
 });
 
@@ -89,7 +96,7 @@ function resetGame() {
 }
 
 // =====================
-// STARS
+// STAR BACKGROUND
 // =====================
 class Star {
     constructor() {
@@ -114,6 +121,7 @@ class Star {
 }
 
 function createStars() {
+    stars = [];
     for (let i = 0; i < 120; i++) {
         stars.push(new Star());
     }
@@ -142,12 +150,10 @@ class Particle {
     draw() {
         ctx.save();
         ctx.globalAlpha = this.life;
-
         ctx.fillStyle = "orange";
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.restore();
     }
 }
@@ -183,13 +189,15 @@ function spawnAsteroid() {
 }
 
 // =====================
-// SPAWN LOOP
+// SPAWN CONTROL
 // =====================
-function spawnLoop() {
-    if (state !== "playing") return;
+function handleSpawning(delta) {
+    spawnTimer += delta;
 
-    spawnAsteroid();
-    setTimeout(spawnLoop, 900);
+    if (spawnTimer > spawnInterval) {
+        spawnAsteroid();
+        spawnTimer = 0;
+    }
 }
 
 // =====================
@@ -205,13 +213,6 @@ function update() {
 
     particles = particles.filter(p => p.life > 0);
     asteroids = asteroids.filter(a => a.y < canvas.height + 100);
-
-    for (let i = asteroids.length - 1; i >= 0; i--) {
-        if (Math.random() < 0.002) {
-            explosion(asteroids[i].x, asteroids[i].y);
-            asteroids.splice(i, 1);
-        }
-    }
 }
 
 // =====================
@@ -236,13 +237,18 @@ function draw() {
 }
 
 // =====================
-// GAME LOOP
+// MAIN GAME LOOP (CLEAN)
 // =====================
-function gameLoop() {
+function gameLoop(timestamp) {
+    requestAnimationFrame(gameLoop);
+
     if (state !== "playing") return;
+
+    const delta = timestamp - lastTime;
+    lastTime = timestamp;
 
     update();
     draw();
 
-    requestAnimationFrame(gameLoop);
+    handleSpawning(delta);
 }
