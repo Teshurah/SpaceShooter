@@ -19,11 +19,11 @@ const startBtn = document.getElementById("startBtn");
 
 // GAME STATE
 let state = "menu";
-let lastTime = 0;
+let lastTime = performance.now();
 let spawnTimer = 0;
 let spawnInterval = 900;
 
-// GAME OBJECTS
+// OBJECTS
 let asteroids = [];
 let stars = [];
 let particles = [];
@@ -50,7 +50,7 @@ const player = {
 };
 
 // =====================
-// START BUTTON FIX
+// START BUTTON
 // =====================
 startBtn.addEventListener("click", () => {
     console.log("START CLICKED");
@@ -174,7 +174,7 @@ function spawnAsteroid() {
 }
 
 // =====================
-// SPAWN SYSTEM
+// SPAWN CONTROL
 // =====================
 function handleSpawning(delta) {
     spawnTimer += delta;
@@ -186,7 +186,7 @@ function handleSpawning(delta) {
 }
 
 // =====================
-// UPDATE GAME
+// UPDATE
 // =====================
 function update() {
     difficulty += 0.002;
@@ -201,21 +201,13 @@ function update() {
 }
 
 // =====================
-// DRAW GAME
+// DRAW
 // =====================
 function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // background stars
     stars.forEach(s => s.draw());
-
-    // asteroids
     asteroids.forEach(a => a.draw());
-
-    // particles
     particles.forEach(p => p.draw());
 
-    // player (safe fallback shape)
     ctx.fillStyle = "cyan";
     ctx.fillRect(
         player.x - player.size / 2,
@@ -226,22 +218,20 @@ function draw() {
 }
 
 // =====================
-// GAME LOOP (FIXED)
+// GAME LOOP (FIXED EXACT VERSION YOU REQUESTED)
 // =====================
 function gameLoop(timestamp) {
-    requestAnimationFrame(gameLoop);
-
     const delta = timestamp - lastTime;
     lastTime = timestamp;
 
-    // ALWAYS draw something (prevents blank screen bugs)
-    if (state !== "playing") {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    requestAnimationFrame(gameLoop);
 
-        // idle background
+    // always clear screen first
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (state !== "playing") {
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
         return;
     }
 
