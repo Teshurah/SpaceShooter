@@ -1,10 +1,12 @@
+window.addEventListener("DOMContentLoaded", () => {
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// resize fix (IMPORTANT for GitHub Pages)
+// resize fix
 window.addEventListener("resize", () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -28,7 +30,7 @@ let particles = [];
 let difficulty = 1;
 
 // =====================
-// IMAGES
+// IMAGES (safe, not blocking)
 // =====================
 const shipImg = new Image();
 const rockImg = new Image();
@@ -38,7 +40,6 @@ shipImg.src = "images/ship.png";
 rockImg.src = "images/rock.png";
 starImg.src = "images/star.png";
 
-// IMPORTANT: DO NOT BLOCK GAME ON LOAD
 let imagesLoaded = true;
 
 // =====================
@@ -51,28 +52,26 @@ const player = {
 };
 
 // =====================
-// START GAME
+// START BUTTON (FIXED)
 // =====================
-window.addEventListener("DOMContentLoaded", () => {
-    startBtn.addEventListener("click", () => {
-        if (state === "playing") return;
+startBtn.addEventListener("click", () => {
+    if (state === "playing") return;
 
-        state = "playing";
+    state = "playing";
 
-        startScreen.classList.add("hidden");
-        gameScreen.classList.remove("hidden");
+    startScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
 
-        resetGame();
+    resetGame();
 
-        lastTime = 0;
-        spawnTimer = 0;
+    lastTime = 0;
+    spawnTimer = 0;
 
-        requestAnimationFrame(gameLoop);
-    });
+    requestAnimationFrame(gameLoop);
 });
 
 // =====================
-// RESET
+// RESET GAME
 // =====================
 function resetGame() {
     asteroids = [];
@@ -210,16 +209,10 @@ function update() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // stars
     stars.forEach(s => s.draw());
-
-    // asteroids
     asteroids.forEach(a => a.draw());
-
-    // particles
     particles.forEach(p => p.draw());
 
-    // ship (safe draw)
     ctx.fillStyle = "cyan";
     ctx.fillRect(
         player.x - player.size / 2,
@@ -245,3 +238,5 @@ function gameLoop(timestamp) {
 
     handleSpawning(delta);
 }
+
+}); // END DOMContentLoaded
