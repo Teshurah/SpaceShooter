@@ -24,6 +24,40 @@ let difficulty = 1;
 let difficultyIncrease = 0.002;
 
 // =====================
+// LOAD IMAGES (IMPORTANT FIX)
+// =====================
+const shipImg = new Image();
+const rockImg = new Image();
+const starImg = new Image();
+
+shipImg.src = "images/ship.png";
+rockImg.src = "images/rock.png";
+starImg.src = "images/star.png";
+
+let assetsLoaded = false;
+let loadedCount = 0;
+
+function checkLoaded() {
+    loadedCount++;
+    if (loadedCount === 3) {
+        assetsLoaded = true;
+    }
+}
+
+shipImg.onload = checkLoaded;
+rockImg.onload = checkLoaded;
+starImg.onload = checkLoaded;
+
+// =====================
+// PLAYER
+// =====================
+const player = {
+    x: canvas.width / 2,
+    y: canvas.height - 100,
+    size: 50
+};
+
+// =====================
 // START GAME
 // =====================
 startBtn.addEventListener("click", () => {
@@ -45,7 +79,7 @@ class Star {
         this.y = Math.random() * canvas.height;
 
         this.size = Math.random() * 2 + 0.3;
-        this.speed = Math.random() * 0.5 + 0.1;
+        this.speed = Math.random() * 0.6 + 0.1;
     }
 
     update() {
@@ -58,14 +92,7 @@ class Star {
     }
 
     draw() {
-        ctx.fillStyle = "white";
-        ctx.globalAlpha = Math.random() * 0.7 + 0.3;
-
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.globalAlpha = 1;
+        ctx.drawImage(starImg, this.x, this.y, this.size * 5, this.size * 5);
     }
 }
 
@@ -101,9 +128,7 @@ class Particle {
         ctx.save();
         ctx.globalAlpha = this.life;
 
-        const colors = ["orange", "yellow", "red", "white"];
-        ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
-
+        ctx.fillStyle = ["orange", "yellow", "red"][Math.floor(Math.random() * 3)];
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -112,7 +137,7 @@ class Particle {
     }
 }
 
-function createExplosion(x, y, power = 18) {
+function createExplosion(x, y, power = 20) {
     for (let i = 0; i < power; i++) {
         particles.push(new Particle(x, y));
     }
@@ -124,11 +149,9 @@ function createExplosion(x, y, power = 18) {
 class Asteroid {
     constructor() {
         this.x = Math.random() * canvas.width;
-        this.y = -50;
+        this.y = -60;
 
-        // ⭐ RANDOM SIZE (important upgrade)
-        this.size = Math.random() * 35 + 15;
-
+        this.size = Math.random() * 40 + 20;
         this.speed = Math.random() * 1.5 + 0.5;
     }
 
@@ -137,11 +160,7 @@ class Asteroid {
     }
 
     draw() {
-        ctx.fillStyle = "gray";
-
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.drawImage(rockImg, this.x, this.y, this.size, this.size);
     }
 }
 
@@ -182,19 +201,35 @@ function update() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // ⭐ background stars first
+    // stars first
     stars.forEach(s => s.draw());
 
-    // game objects
+    // asteroids
     asteroids.forEach(a => a.draw());
+
+    // particles
     particles.forEach(p => p.draw());
+
+    // player ship
+    ctx.drawImage(
+        shipImg,
+        player.x - player.size / 2,
+        player.y - player.size / 2,
+        player.size,
+        player.size
+    );
 }
 
 // =====================
-// LOOP
+// GAME LOOP
 // =====================
 function gameLoop() {
     if (!gameStarted) return;
+
+    if (!assetsLoaded) {
+        requestAnimationFrame(gameLoop);
+        return;
+    }
 
     update();
     draw();
