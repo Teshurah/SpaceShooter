@@ -12,9 +12,9 @@ const gameScreen = document.getElementById("gameScreen");
 const startBtn = document.getElementById("startBtn");
 
 // =====================
-// GAME STATE
+// GAME STATE (FIXED SYSTEM)
 // =====================
-let gameStarted = false;
+let state = "menu"; // menu | playing
 
 let asteroids = [];
 let stars = [];
@@ -24,7 +24,7 @@ let difficulty = 1;
 let difficultyIncrease = 0.002;
 
 // =====================
-// IMAGES (FIXED PATHS)
+// IMAGES (SAFE LOADING)
 // =====================
 const shipImg = new Image();
 const rockImg = new Image();
@@ -34,20 +34,22 @@ shipImg.src = "images/ship.png";
 rockImg.src = "images/rock.png";
 starImg.src = "images/star.png";
 
-let assetsLoaded = 0;
-let assetsReady = false;
+// =====================
+// START GAME (FIXED)
+// =====================
+startBtn.addEventListener("click", () => {
+    if (state !== "menu") return;
 
-function onAssetLoad() {
-    assetsLoaded++;
-    if (assetsLoaded === 3) {
-        assetsReady = true;
-        console.log("All assets loaded");
-    }
-}
+    startScreen.classList.add("hidden");
+    gameScreen.classList.remove("hidden");
 
-shipImg.onload = onAssetLoad;
-rockImg.onload = onAssetLoad;
-starImg.onload = onAssetLoad;
+    state = "playing";
+
+    stars = [];
+    createStars();
+
+    gameLoop();
+});
 
 // =====================
 // PLAYER
@@ -57,23 +59,6 @@ const player = {
     y: canvas.height - 120,
     size: 60
 };
-
-// =====================
-// START GAME (FIXED)
-// =====================
-startBtn.addEventListener("click", () => {
-    if (gameStarted) return;
-
-    startScreen.classList.add("hidden");
-    gameScreen.classList.remove("hidden");
-
-    gameStarted = true;
-
-    stars = [];
-    createStars();
-
-    requestAnimationFrame(gameLoop);
-});
 
 // =====================
 // STARS
@@ -177,7 +162,7 @@ function spawnAsteroid() {
 
 // spawn loop (safe)
 setInterval(() => {
-    if (!gameStarted) return;
+    if (state !== "playing") return;
     spawnAsteroid();
 }, 900);
 
@@ -210,16 +195,10 @@ function update() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // stars
     stars.forEach(s => s.draw());
-
-    // asteroids
     asteroids.forEach(a => a.draw());
-
-    // particles
     particles.forEach(p => p.draw());
 
-    // player ship
     ctx.drawImage(
         shipImg,
         player.x - player.size / 2,
@@ -230,15 +209,10 @@ function draw() {
 }
 
 // =====================
-// GAME LOOP (FIXED)
+// GAME LOOP (CLEAN + SAFE)
 // =====================
 function gameLoop() {
-    if (!gameStarted) return;
-
-    if (!assetsReady) {
-        requestAnimationFrame(gameLoop);
-        return;
-    }
+    if (state !== "playing") return;
 
     update();
     draw();
