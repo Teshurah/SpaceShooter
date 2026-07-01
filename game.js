@@ -7,9 +7,6 @@ startBtn.addEventListener("click", () => {
     gameScreen.classList.remove("hidden");
     console.log("Game screen shown");
 
-    createStars();
-    console.log("Stars created");
-
     resetGame();
     console.log("Game reset");
 
