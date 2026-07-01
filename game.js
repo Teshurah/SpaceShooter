@@ -12,15 +12,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
     let gameStarted = false;
 
+    let keys = {};
+
     const player = {
         x: canvas.width / 2,
         y: canvas.height - 80,
         width: 40,
         height: 40,
-        speed: 7
+        speed: 6
     };
-
-    let keys = {};
 
     window.addEventListener("keydown", (e) => {
         keys[e.key] = true;
@@ -31,10 +31,8 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     startBtn.addEventListener("click", () => {
-
         startScreen.classList.add("hidden");
         gameScreen.classList.remove("hidden");
-
         gameStarted = true;
     });
 
@@ -63,7 +61,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (!gameStarted) return;
 
-        // Draw player
+        // spaceship
         ctx.fillStyle = "cyan";
 
         ctx.beginPath();
@@ -81,6 +79,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
 
         draw();
+
         requestAnimationFrame(gameLoop);
     }
 
