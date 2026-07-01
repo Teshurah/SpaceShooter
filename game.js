@@ -1,13 +1,21 @@
-window.addEventListener("DOMContentLoaded", () => {
+startBtn.addEventListener("click", () => {
+    console.log("Start clicked");
 
-    const startBtn = document.getElementById("startBtn");
+    startScreen.classList.add("hidden");
+    console.log("Start screen hidden");
 
-    console.log("JavaScript loaded");
-    console.log(startBtn);
+    gameScreen.classList.remove("hidden");
+    console.log("Game screen shown");
 
-    startBtn.addEventListener("click", () => {
-        console.log("Button clicked!");
-        alert("Button works!");
-    });
+    resizeCanvas();
+    console.log("Canvas resized");
 
+    createStars();
+    console.log("Stars created");
+
+    resetGame();
+    console.log("Game reset");
+
+    state = "playing";
+    console.log("State changed:", state);
 });
