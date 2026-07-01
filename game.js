@@ -1,15 +1,89 @@
-startBtn.addEventListener("click", () => {
-    console.log("Start clicked");
+window.addEventListener("DOMContentLoaded", () => {
 
-    startScreen.classList.add("hidden");
-    console.log("Start screen hidden");
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-    gameScreen.classList.remove("hidden");
-    console.log("Game screen shown");
+    const startScreen = document.getElementById("startScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const startBtn = document.getElementById("startBtn");
 
-    resetGame();
-    console.log("Game reset");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    state = "playing";
-    console.log("State changed:", state);
+    let gameStarted = false;
+
+    const player = {
+        x: canvas.width / 2,
+        y: canvas.height - 80,
+        width: 40,
+        height: 40,
+        speed: 7
+    };
+
+    let keys = {};
+
+    window.addEventListener("keydown", (e) => {
+        keys[e.key] = true;
+    });
+
+    window.addEventListener("keyup", (e) => {
+        keys[e.key] = false;
+    });
+
+    startBtn.addEventListener("click", () => {
+
+        startScreen.classList.add("hidden");
+        gameScreen.classList.remove("hidden");
+
+        gameStarted = true;
+    });
+
+    function update() {
+
+        if (keys["ArrowLeft"] || keys["a"]) {
+            player.x -= player.speed;
+        }
+
+        if (keys["ArrowRight"] || keys["d"]) {
+            player.x += player.speed;
+        }
+
+        if (player.x < 20) player.x = 20;
+        if (player.x > canvas.width - 20) {
+            player.x = canvas.width - 20;
+        }
+    }
+
+    function draw() {
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if (!gameStarted) return;
+
+        // Draw player
+        ctx.fillStyle = "cyan";
+
+        ctx.beginPath();
+        ctx.moveTo(player.x, player.y - 20);
+        ctx.lineTo(player.x - 20, player.y + 20);
+        ctx.lineTo(player.x + 20, player.y + 20);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function gameLoop() {
+
+        if (gameStarted) {
+            update();
+        }
+
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    gameLoop();
+
 });
