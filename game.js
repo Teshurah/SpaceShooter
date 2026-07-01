@@ -8,7 +8,10 @@ window.addEventListener("DOMContentLoaded", () => {
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        player.y = canvas.height - 100;
+
+        if (player) {
+            player.y = canvas.height - 100;
+        }
     }
 
     window.addEventListener("resize", resizeCanvas);
@@ -113,10 +116,14 @@ window.addEventListener("DOMContentLoaded", () => {
     // ================= START GAME =================
 
     startBtn.addEventListener("click", () => {
+
         startScreen.classList.add("hidden");
         gameScreen.classList.remove("hidden");
 
+        resizeCanvas();
+        createStars();
         resetGame();
+
         state = "playing";
     });
 
@@ -129,13 +136,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
         player.x = canvas.width / 2;
         player.y = canvas.height - 100;
+
+        asteroidTimer = 0;
     }
 
     // ================= UPDATE =================
 
     function update() {
 
-        // Movement
+        // Move player
 
         if (keys["ArrowLeft"] || keys["a"]) {
             player.x -= player.speed;
@@ -150,7 +159,7 @@ window.addEventListener("DOMContentLoaded", () => {
             Math.min(canvas.width - player.width / 2, player.x)
         );
 
-        // Shooting
+        // Shoot
 
         shootCooldown--;
 
@@ -239,7 +248,7 @@ window.addEventListener("DOMContentLoaded", () => {
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Stars
+        // Draw stars
 
         ctx.fillStyle = "white";
 
@@ -258,7 +267,7 @@ window.addEventListener("DOMContentLoaded", () => {
         ctx.font = "24px Arial";
         ctx.fillText(`Score: ${score}`, 20, 40);
 
-        // Player
+        // Draw player
 
         ctx.fillStyle = "cyan";
 
@@ -269,7 +278,7 @@ window.addEventListener("DOMContentLoaded", () => {
         ctx.closePath();
         ctx.fill();
 
-        // Bullets
+        // Draw bullets
 
         ctx.fillStyle = "yellow";
 
@@ -282,19 +291,13 @@ window.addEventListener("DOMContentLoaded", () => {
             );
         });
 
-        // Asteroids
+        // Draw asteroids
 
         ctx.fillStyle = "gray";
 
         asteroids.forEach(a => {
             ctx.beginPath();
-            ctx.arc(
-                a.x,
-                a.y,
-                a.size / 2,
-                0,
-                Math.PI * 2
-            );
+            ctx.arc(a.x, a.y, a.size / 2, 0, Math.PI * 2);
             ctx.fill();
         });
 
@@ -325,7 +328,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ================= LOOP =================
+    // ================= GAME LOOP =================
 
     function gameLoop() {
 
@@ -338,8 +341,8 @@ window.addEventListener("DOMContentLoaded", () => {
         requestAnimationFrame(gameLoop);
     }
 
+    // Start the loop once
     resizeCanvas();
-    createStars();
     gameLoop();
 
 });
