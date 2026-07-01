@@ -7,43 +7,52 @@
 body {
     overflow: hidden;
     background: black;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
 }
 
 /* START SCREEN */
+
 #startScreen {
     position: absolute;
     width: 100vw;
     height: 100vh;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: radial-gradient(circle, #0b0f2a, black);
+
+    background: radial-gradient(circle, #0b1a3d, black);
     color: white;
     z-index: 10;
 }
 
 #startScreen h1 {
+    font-size: 3rem;
     color: cyan;
-    font-size: 40px;
+    margin-bottom: 15px;
+}
+
+#startScreen p {
+    margin-bottom: 20px;
 }
 
 #startBtn {
-    margin-top: 20px;
-    padding: 12px 25px;
-    border: none;
-    cursor: pointer;
-    background: cyan;
+    padding: 12px 30px;
     font-size: 18px;
+    border: none;
     border-radius: 8px;
+    background: cyan;
+    cursor: pointer;
+}
+
+#startBtn:hover {
+    opacity: 0.9;
 }
 
 /* GAME SCREEN */
+
 #gameScreen {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100vw;
     height: 100vh;
 }
