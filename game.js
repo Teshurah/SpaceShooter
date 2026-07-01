@@ -7,9 +7,6 @@ startBtn.addEventListener("click", () => {
     gameScreen.classList.remove("hidden");
     console.log("Game screen shown");
 
-    resizeCanvas();
-    console.log("Canvas resized");
-
     createStars();
     console.log("Stars created");
 
